@@ -1,5 +1,5 @@
 [package]
-name = "plugger_ruby"
+name = "plugger-ruby"
 version = "0.1.0"
 authors = ["Dylan McKay <dylan.mckay@powershop.co.nz>"]
 
@@ -12,5 +12,13 @@ license = "MIT"
 
 [dependencies]
 rurust = "0.1.0"
-plugger-core = "0.1.0"
+plugger-core = "0.1.1"
+plugger-macros = "0.1.1"
 
+[lib]
+name = "plugger_ruby"
+path = "src/lib.rs"
+
+[[bin]]
+name = "test"
+path = "tools/test.rs"
