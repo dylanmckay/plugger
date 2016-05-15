@@ -4,3 +4,6 @@ version = "0.1.0"
 authors = ["Dylan McKay <dylan.mckay@powershop.co.nz>"]
 
 [dependencies]
+rurust = "0.1.0"
+plugger-core = "0.1.0"
+
