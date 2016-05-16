@@ -1,6 +1,9 @@
 extern crate plugger_core;
 extern crate rurust;
 
+/// Shim functions which act as middlemen between C and Ruby.
+pub mod shims;
+
 use plugger_core::Pluggable;
 
 pub extern fn do_something() {
@@ -28,9 +31,11 @@ impl Ruby
     }
 
     pub fn plug(&mut self, object: &mut Pluggable) {
-        object.methods().iter().fold(self.vm.class(object.name()), |class, method| {
-            class.singleton_method(method.name, do_something as *const u8, 0)
-        }).build();
+        let mut object = object.methods().iter().fold(self.vm.class(object.name()), |class, method| {
+            class.method(method.name, shims::ruby_method_arg0 as *const u8, 0)
+        });
+
+        object.build();
     }
 
     pub fn eval(&mut self, code: &str) -> Result<String, ErrorKind> {
