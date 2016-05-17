@@ -9,7 +9,7 @@ use std::io::Write;
 
 #[pluggable]
 struct Animal {
-    a: u32,
+    pub a: u32,
 }
 
 #[pluggable]
