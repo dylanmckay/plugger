@@ -12,8 +12,8 @@ license = "MIT"
 
 [dependencies]
 rurust = "0.1.1"
-plugger-core = "0.1.1"
-plugger-macros = "0.1.1"
+plugger-core = "0.1.2"
+plugger-macros = "0.1.2"
 
 [lib]
 name = "plugger_ruby"

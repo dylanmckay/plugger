@@ -15,8 +15,14 @@ struct Animal {
 #[pluggable]
 impl Animal
 {
+    #[plug]
     pub fn woof() { println!("woof!"); }
+
+    #[plug]
     pub fn meow() { println!("meow!"); }
+
+    #[plug]
+    pub fn moo(&self) { println!("moo!"); }
 }
 
 fn main() {

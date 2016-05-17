@@ -32,7 +32,11 @@ impl Ruby
 
     pub fn plug(&mut self, object: &mut Pluggable) {
         let object = object.methods().iter().fold(self.vm.class(object.name()), |class, method| {
-            class.method(method.name, shims::ruby_method_arg0 as *mut _, 0)
+            if method.is_static() {
+                class.singleton_method(method.name, shims::ruby_method_arg0 as *mut _, 0)
+            } else {
+                class.method(method.name, shims::ruby_method_arg0 as *mut _, 0)
+            }
         });
 
         object.build();
