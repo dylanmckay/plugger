@@ -22,11 +22,13 @@ impl Animal
     pub fn meow() { println!("meow!"); }
 
     #[plug]
-    pub fn moo(&self) { println!("moo!"); }
+    pub fn moo(&self) {
+        println!("moo!! = {}", self.a);
+    }
 }
 
 fn main() {
-    let mut animal = Animal { a: 0 };
+    let mut animal = Animal { a: 512 };
 
     let mut ruby = plugger_ruby::Ruby::new().unwrap();
     ruby.plug(&mut animal);
