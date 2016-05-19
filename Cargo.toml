@@ -11,9 +11,10 @@ keywords = ["ruby", "plugin"]
 license = "MIT"
 
 [dependencies]
-rurust = "0.1.1"
+rurust = "0.1.4"
 plugger-core = "0.1.2"
 plugger-macros = "0.1.2"
+libc = "0.2.11"
 
 [lib]
 name = "plugger_ruby"

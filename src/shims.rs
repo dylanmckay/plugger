@@ -1,21 +1,94 @@
 use rurust::Value;
 use plugger_core::Pluggable;
+use libc;
 
-struct Abc;
+/// A placeholder for any Rust struct.
+pub struct Receiver;
 
-#[no_mangle]
-pub extern fn ruby_method_arg0(receiver: Value, function_address: Value) -> Value {
-    let method_ptr_str = function_address.display_string();
-    let method_ptr = usize::from_str_radix(&method_ptr_str, 10).unwrap();
-    let object_ptr_str = receiver.call_no_args("object_pointer").display_string();
-    let object_ptr = usize::from_str_radix(&object_ptr_str, 10).unwrap();
+/// A method which takes a receiver.
+pub type Method = fn(&mut Receiver) -> Value;
+/// A function.
+pub type Function = fn() -> Value;
 
-    let obj_pointer: *mut Abc = unsafe { ::std::mem::transmute(object_ptr) };
-    let obj: &Abc = unsafe { ::std::mem::transmute(obj_pointer) };
+/// Shim to call a Rust method (taking `&self`) from Ruby.
+pub extern fn ruby_method(argc: libc::c_int, argv: *const Value, object: Value) -> Value {
+    let (method, arguments) = helpers::process_method_arguments(argc, argv);
 
-    let func: fn(&Abc) -> Value = unsafe { ::std::mem::transmute(method_ptr) };
-    func(obj);
+    println!("sent from object : {:?}", object);
 
-    Value::nil()
+    for argument in arguments.iter() {
+        println!("received argument: {:?}", argument);
+    }
+
+    let receiver = helpers::reference_to_struct(object);
+
+    method(receiver)
+}
+
+/// Shim to call a Rust function (doesn't take `self`) from Ruby.
+pub extern fn ruby_singleton_method(argc: libc::c_int, argv: *const Value, class: Value) -> Value {
+    let (function, arguments) = helpers::process_function_arguments(argc, argv);
+
+    println!("class: {:?}", class);
+
+    for argument in arguments.iter() {
+        println!("received argument: {:?}", argument);
+    }
+
+    function()
+}
+
+mod helpers {
+    use super::{Receiver, Method, Function};
+    use rurust::Value;
+    use std::{mem, slice};
+    use libc;
+
+    /// Stores the arguments there were passed to the shim.
+    struct Arguments<'a> {
+        function_ptr: Value,
+        normal_arguments: &'a [Value],
+    }
+
+    /// Processes the arguments given to a method shim.
+    pub fn process_method_arguments<'a>(argc: libc::c_int, argv: *const Value) -> (Method, &'a [Value]) {
+        let arguments = self::separate_arguments(argc, argv);
+        (self::method(arguments.function_ptr), arguments.normal_arguments)
+    }
+
+    /// Processes the arguments given to a function shim.
+    pub fn process_function_arguments<'a>(argc: libc::c_int, argv: *const Value) -> (Function, &'a [Value]) {
+        let arguments = self::separate_arguments(argc, argv);
+        (self::function(arguments.function_ptr), arguments.normal_arguments)
+    }
+
+    /// Given an `argc` and `argv` pair, create a new `Arguments` object.
+    fn separate_arguments<'a>(argc: libc::c_int, argv: *const Value) -> Arguments<'a> {
+        let all_arguments = unsafe { slice::from_raw_parts(argv, argc as usize) };
+
+        Arguments {
+            function_ptr: all_arguments[0],
+            normal_arguments: &all_arguments[1..],
+        }
+    }
+
+    /// Gets a reference to the Rust struct from the associated Ruby object.
+    pub fn reference_to_struct<'a>(ruby_object: Value) -> &'a mut Receiver {
+        let ptr = ruby_object.call_no_args("object_pointer").to_u64() as usize;
+        let receiver: &mut Receiver = unsafe { mem::transmute(ptr) };
+        receiver
+    }
+
+    /// Creates a method from a function pointer given from Ruby.
+    fn method(function_pointer: Value) -> Method {
+        unsafe { mem::transmute(self::function(function_pointer)) }
+    }
+
+    /// Creates a function from a function pointer given from Ruby.
+    fn function(function_pointer: Value) -> Function {
+        let ptr = function_pointer.to_u64() as usize;
+
+        unsafe { mem::transmute(ptr) }
+    }
 }
 

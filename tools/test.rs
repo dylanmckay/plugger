@@ -4,8 +4,10 @@
 
 extern crate plugger_ruby;
 extern crate plugger_core;
+extern crate rurust;
 
 use std::io::Write;
+use rurust::Value;
 
 #[pluggable]
 struct Animal {
@@ -16,14 +18,20 @@ struct Animal {
 impl Animal
 {
     #[plug]
-    pub fn woof() { println!("woof!"); }
+    pub fn woof() -> Value {
+        Value::nil()
+    }
 
     #[plug]
-    pub fn meow() { println!("meow!"); }
+    pub fn meow() -> Value {
+        println!("meow!");
+        Value::string("meooooooow")
+    }
 
     #[plug]
-    pub fn moo(&self) {
+    pub fn moo(&self) -> Value {
         println!("moo!! = {}", self.a);
+        Value::fixnum(self.a as _)
     }
 }
 
@@ -31,7 +39,7 @@ fn main() {
     let mut animal = Animal { a: 512 };
 
     let mut ruby = plugger_ruby::Ruby::new().unwrap();
-    ruby.plug(&mut animal);
+    ruby.plug("animal", &mut animal);
 
     loop {
         let mut line = String::new();
