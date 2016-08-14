@@ -1,5 +1,4 @@
 use rurust::Value;
-use plugger_core::Pluggable;
 use libc;
 
 /// A placeholder for any Rust struct.

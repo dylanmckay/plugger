@@ -11,7 +11,6 @@ const RUBY_SUPPORT: &'static str = include_str!("../support/ruby.rb");
 const PLUGGER_BASE_CLASS: &'static str = "PluggerObject";
 
 use plugger_core::Pluggable;
-use rurust::Value;
 
 pub extern fn do_something() {
     println!("do_something");
@@ -51,7 +50,7 @@ impl Ruby
 
             let name = format!("{}_internal", method.name);
 
-            if method.is_static() {
+            if method.is_static {
                 class.singleton_method(name, shims::ruby_singleton_method as *mut _, -1)
             } else {
                 class.method(name, shims::ruby_method as *mut _, -1)
