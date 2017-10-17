@@ -31,7 +31,7 @@ impl Animal
     #[plug]
     pub fn moo(&self) -> Value {
         println!("moo!! = {}", self.a);
-        Value::fixnum(self.a as _)
+        Value::integer(self.a as _)
     }
 }
 
