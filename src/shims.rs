@@ -13,26 +13,13 @@ pub type Function = fn() -> Value;
 pub extern fn ruby_method(argc: libc::c_int, argv: *const Value, object: Value) -> Value {
     let (method, arguments) = helpers::process_method_arguments(argc, argv);
 
-    println!("sent from object : {:?}", object);
-
-    for argument in arguments.iter() {
-        println!("received argument: {:?}", argument);
-    }
-
     let receiver = helpers::reference_to_struct(object);
-
     method(receiver)
 }
 
 /// Shim to call a Rust function (doesn't take `self`) from Ruby.
 pub extern fn ruby_singleton_method(argc: libc::c_int, argv: *const Value, class: Value) -> Value {
     let (function, arguments) = helpers::process_function_arguments(argc, argv);
-
-    println!("class: {:?}", class);
-
-    for argument in arguments.iter() {
-        println!("received argument: {:?}", argument);
-    }
 
     function()
 }

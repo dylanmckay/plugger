@@ -57,7 +57,6 @@ class PluggerObject
 
   def self.pointer_to_function(name)
     pointer_const_name = name.to_s.upcase
-    puts "checking: #{pointer_const_name}"
     self.const_get(pointer_const_name)
   end
 end
