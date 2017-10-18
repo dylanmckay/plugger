@@ -31,7 +31,8 @@ The thing that separates the library from the others is that it allows you to
 - [ ] Accessing public struct fields from Ruby
 - [ ] Creating new Rust objects via Ruby
 - [ ] Complicated types such as enums, tuples
-- [ ] Automatic marshalling of Ruby values into Rust types (function arguments & return values)
+- [x] Automatic marshalling of Ruby arguments into Rust types
+- [ ] Automatic marshalling of Rust return types into Ruby values
 - [ ] Support for Python
 
 ## Example
