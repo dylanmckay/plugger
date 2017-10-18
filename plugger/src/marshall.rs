@@ -168,8 +168,25 @@ fn create_lang_marshall(ecx: &mut ExtCtxt,
         }
     }).collect();
 
+    let mut stmts = Vec::new();
+
     let call_expr = ecx.expr_call(DUMMY_SP, common_marshall_expr, args);
-    let block = ecx.block_expr(call_expr);
+    let call_stmt = ecx.stmt_expr(call_expr);
+
+    stmts.push(call_stmt);
+
+    match method_sig.decl.output {
+        // If we have no return type, but the language has a default value, use it.
+        ast::FunctionRetTy::Default(..) => if let Some(default_retval) = lang.default_return_value(ecx) {
+            let value_ty = lang.value_ty(ecx);
+
+            marshall_sig.decl = util::set_return_type(marshall_sig.decl, value_ty);
+            stmts.push(ecx.stmt_expr(default_retval));
+        },
+        ast::FunctionRetTy::Ty(..) => (),
+    }
+
+    let block = ecx.block(DUMMY_SP, stmts);
 
     ImplItem {
         id: DUMMY_NODE_ID,

@@ -41,3 +41,12 @@ pub fn replace_signature_types(decl: P<ast::FnDecl>, new_ty: P<ast::Ty>) -> P<as
     })
 }
 
+/// Replaces all parameter types in a function declaration.
+pub fn set_return_type(decl: P<ast::FnDecl>, new_ty: P<ast::Ty>) -> P<ast::FnDecl> {
+    P(ast::FnDecl {
+        output: ast::FunctionRetTy::Ty(new_ty.clone()),
+        inputs: decl.inputs.clone(),
+        variadic: decl.variadic,
+    })
+}
+
