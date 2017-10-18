@@ -1,18 +1,19 @@
 [package]
 name = "plugger"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Dylan McKay <me@dylanmckay.io>"]
 
 description = "Plugger"
 
 repository = "https://github.com/dylanmckay/plugger"
-keywords = ["plugin"]
 
+readme = "../README.md"
+keywords = ["plugin"]
 license = "MIT"
 
 [dependencies]
-plugger-core = { path = "../core" }
-plugger-ruby = { path = "../ruby", optional = true }
+plugger-core = { path = "../core", version = "0.3" }
+plugger-ruby = { path = "../ruby", version = "0.3", optional = true }
 
 [features]
 default = ["ruby"]

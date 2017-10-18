@@ -1,18 +1,18 @@
 [package]
 name = "plugger-ruby"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Dylan McKay <me@dylanmckay.io>"]
 
 description = "Ruby bindings to Plugger"
 repository = "https://github.com/dylanmckay/plugger"
 
-readme = "README.md"
+readme = "../README.md"
 keywords = ["ruby", "plugin"]
 license = "MIT"
 
 [dependencies]
 rurust = "0.1.6"
-plugger-core = { path = "../core" }
+plugger-core = { version = "0.3.0", path = "../core" }
 libc = "0.2.11"
 
 [lib]
