@@ -5,8 +5,7 @@ authors = ["Dylan McKay <me@dylanmckay.io>"]
 
 description = "Plugger macros"
 
-# These URLs point to more information about the repository.
-# FIXME: repository = "https://github.com/dylanmckay/plugger-core"
+repository = "https://github.com/dylanmckay/plugger"
 keywords = ["plugin"]
 
 license = "MIT"

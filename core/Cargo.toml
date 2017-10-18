@@ -3,10 +3,10 @@ name = "plugger-core"
 version = "0.2.0"
 authors = ["Dylan McKay <me@dylanmckay.io>"]
 
-description = "the Plugger core"
+description = "The Plugger support library"
 
-repository = "https://github.com/dylanmckay/plugger-core"
-readme = "README.md"
+repository = "https://github.com/dylanmckay/plugger"
+readme = "../README.md"
 keywords = ["plugin"]
 license = "MIT"
 

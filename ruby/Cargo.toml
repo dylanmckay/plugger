@@ -1,10 +1,10 @@
 [package]
 name = "plugger-ruby"
 version = "0.2.0"
-authors = ["Dylan McKay <dylan.mckay@powershop.co.nz>"]
+authors = ["Dylan McKay <me@dylanmckay.io>"]
 
 description = "Ruby bindings to Plugger"
-repository = "https://github.com/dylanmckay/plugger-ruby"
+repository = "https://github.com/dylanmckay/plugger"
 
 readme = "README.md"
 keywords = ["ruby", "plugin"]
