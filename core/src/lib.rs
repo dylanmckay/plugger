@@ -82,6 +82,8 @@ pub trait Marshall
     fn from_i16(value: i16) -> Self::Value;
     fn from_i32(value: i32) -> Self::Value;
     fn from_i64(value: i64) -> Self::Value;
+    fn from_f32(value: f32) -> Self::Value;
+    fn from_f64(value: f64) -> Self::Value;
     fn from_string(value: String) -> Self::Value;
 }
 

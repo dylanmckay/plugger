@@ -15,25 +15,25 @@ pub struct Player {
 
 #[pluggable]
 impl Player {
-    #[plug]
     pub fn info(&self) -> String {
         println!("Player at ({},{},{})", self.x, self.y, self.z);
         "meooooooow".to_owned()
     }
 
-    #[plug]
     pub fn set_health(&self, health: u8) {
         println!("setting health to '{}'", health);
     }
 
-    #[plug]
     pub fn set_foobar(foobar: String) {
         println!("setting foobar to '{}'", foobar);
     }
 
-    #[plug]
     pub fn other(&self) -> u32 {
         12345
+    }
+
+    fn private_method(&self) -> f32 {
+        self.x + self.y
     }
 }
 

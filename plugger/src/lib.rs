@@ -15,7 +15,7 @@ mod util;
 use rustc_plugin::Registry;
 
 use syntax::ptr::P;
-use syntax::ast::{Item, ItemKind, MetaItem, Name, Attribute};
+use syntax::ast::{self, Item, ItemKind, MetaItem, Name};
 use syntax::ext::base::{ExtCtxt,Annotatable};
 use syntax::codemap::Span;
 use syntax::ext::base::SyntaxExtension;
@@ -26,8 +26,9 @@ use syntax::codemap::DUMMY_SP;
 // TODO: Warn when exporting something private
 
 /// We should only export things with `#[plug]`.
-pub fn should_export(attrs: &[Attribute]) -> bool {
-    attrs.iter().any(|attr| attr.path == "plug")
+/// Checks if an impl item is pluggable.
+pub fn is_pluggable_impl_item(impl_item: &ast::ImplItem) -> bool {
+    impl_item.vis == ast::Visibility::Public
 }
 
 #[plugin_registrar]
@@ -38,7 +39,6 @@ pub fn registrar(reg: &mut Registry) {
     );
 
     reg.register_attribute("pluggable".into(), AttributeType::Normal);
-    reg.register_attribute("plug".into(), AttributeType::Whitelisted);
 }
 
 /// If the #[pluggable] attribute is on the struct, it is plain old data with no methods.
@@ -66,7 +66,7 @@ fn expand_pluggable(ecx: &mut ExtCtxt, sp: Span, _meta_item: &MetaItem, item: An
             },
             ItemKind::Impl(unsafety,polarity,defaultness,generics,tref, ty, impl_items) => {
                 let pluggable_impl_items: Vec<_> = impl_items.iter().cloned()
-                    .filter(|impl_item| should_export(&impl_item.attrs))
+                    .filter(is_pluggable_impl_item)
                     .collect();
 
                 // Create function stubs for marshalling.

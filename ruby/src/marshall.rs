@@ -72,6 +72,8 @@ impl plugger_core::Marshall for Marshall {
     fn from_i16(value: i16) -> Value { Value::integer(value as i64) }
     fn from_i32(value: i32) -> Value { Value::integer(value as i64) }
     fn from_i64(value: i64) -> Value { Value::integer(value) }
+    fn from_f32(value: f32) -> Value { Value::float(value as f64) }
+    fn from_f64(value: f64) -> Value { Value::float(value) }
     fn from_string(value: String) -> Value {
         Value::string(value)
     }
