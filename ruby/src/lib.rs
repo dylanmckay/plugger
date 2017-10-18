@@ -20,6 +20,8 @@ const PLUGGER_BASE_CLASS: &'static str = "PluggerObject";
 
 use plugger_core::Pluggable;
 
+static mut VM_INITIALISED: bool = false;
+
 pub extern fn do_something() {
     println!("do_something");
 }
@@ -30,31 +32,21 @@ pub enum ErrorKind
     Ruby(rurust::ErrorKind),
 }
 
-pub struct Ruby
-{
-    pub vm: rurust::VM,
-}
+pub struct Ruby;
 
 impl Ruby
 {
     pub fn new() -> Result<Self, ErrorKind> {
-        match rurust::VM::new() {
-            Ok(vm) => {
-                let mut ruby = Ruby { vm: vm };
-                ruby.eval(RUBY_SUPPORT).expect("the support module crashed");
-
-                Ok(ruby)
-            }
-            Err(e) => return Err(ErrorKind::Ruby(e)),
-        }
+        Ok(Ruby)
     }
 
     pub fn plug<P>(&mut self, name: &str, object: &mut P) where P: Pluggable {
-        let base_class = self.vm.eval(PLUGGER_BASE_CLASS).expect("could not find the plugger base class");
+        let mut vm = vm();
+        let base_class = vm.eval(PLUGGER_BASE_CLASS).expect("could not find the plugger base class");
 
-        let class_builder = object.methods().iter().fold(self.vm.class(object.name()).extend(base_class), |class, method| {
+        let class_builder = object.methods().iter().fold(vm.class(object.name()).extend(base_class), |class, method| {
             let ptr = method.marshall("ruby") as usize;
-            let ptr_value = self.vm.eval(&format!("{}", ptr)).unwrap();
+            let ptr_value = vm.eval(&format!("{}", ptr)).unwrap();
             let realised_param_count = method.parameters.len();
             let actual_param_count = realised_param_count + 1; // Account for the hidden func ptr parameter.
 
@@ -67,24 +59,36 @@ impl Ruby
             }.constant(method.name.to_uppercase(), ptr_value)
         });
 
-        // class_builder = class_builder.constant("PLUGGED_METHODS", jkjk
-
         class_builder.build();
         let ptr = object as *mut _ as usize;
 
         let constant_name = name.to_uppercase();
 
-        let ruby_val = self.vm.eval(&format!("{}.new({})", object.name(), ptr)).unwrap();
-        self.vm.set_global_const(&constant_name, ruby_val);
+        let ruby_val = vm.eval(&format!("{}.new({})", object.name(), ptr)).unwrap();
+        vm.set_global_const(&constant_name, ruby_val);
 
         println!("Plugging in {} {}", object.name(), constant_name);
     }
 
     pub fn eval(&mut self, code: &str) -> Result<String, ErrorKind> {
-        match self.vm.eval(code) {
+        match vm().eval(code) {
             Ok(val) => Ok(val.inspect_string()),
             Err(e) => Err(ErrorKind::Ruby(e)),
         }
     }
+
+}
+
+fn vm() -> ::std::sync::MutexGuard<'static, rurust::VM> {
+    let mut vm = rurust::VM::get().lock().unwrap();
+
+    unsafe {
+        // FIXME: use a mutex or something
+        if !VM_INITIALISED {
+            vm.eval(RUBY_SUPPORT).expect("the support module crashed");
+            VM_INITIALISED = true;
+        }
+    }
+    vm
 }
 

@@ -10,7 +10,7 @@ pub fn implement_pluggable(ecx: &mut ExtCtxt, ty: &P<Ty>) -> Annotatable {
     let ty_path = util::ty_path(ty);
     let ty_name = util::ty_name_str(ty).as_str();
 
-    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_FOR_{}", ty.id));
+    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_FOR_{}", ty_name));
 
     Annotatable::Item(quote_item!(ecx,
         #[allow(non_upper_case_globals)]
@@ -26,7 +26,8 @@ pub fn implement_pluggable(ecx: &mut ExtCtxt, ty: &P<Ty>) -> Annotatable {
 
 pub fn implement_pluggable_fields(ecx: &mut ExtCtxt, ty: &P<Ty>, item: &Item) -> Annotatable {
     let ty_path = util::ty_path(ty);
-    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_FIELDS_FOR_{}", ty.id));
+    let ty_name = util::ty_name_str(ty);
+    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_FIELDS_FOR_{}", ty_name));
 
     let fields = pluggable_struct_fields(ecx, item);
     let fields_body = ecx.expr_vec(DUMMY_SP, fields);
@@ -47,7 +48,8 @@ pub fn implement_pluggable_fields(ecx: &mut ExtCtxt, ty: &P<Ty>, item: &Item) ->
 
 pub fn implement_pluggable_methods(ecx: &mut ExtCtxt, ty: &P<Ty>, impl_items: &[ImplItem]) -> Annotatable {
     let ty_path = util::ty_path(ty);
-    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_METHODS_FOR_{}", ty.id));
+    let ty_name = util::ty_name_str(ty);
+    let dummy_const = ecx.ident_of(&format!("_IMPL_PLUGGABLE_METHODS_FOR_{}", ty_name));
 
     let methods = pluggable_struct_methods(ecx, ty, impl_items);
     let methods_body = ecx.expr_vec(DUMMY_SP, methods);

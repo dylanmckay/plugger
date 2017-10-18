@@ -77,5 +77,11 @@ impl plugger_core::Marshall for Marshall {
     fn from_string(value: String) -> Value {
         Value::string(value)
     }
+
+    fn object_pointer_from_value<T>(value: Value) -> *mut T
+        where T: plugger_core::Pluggable {
+        let pointer_val = value.call_no_args("object_pointer");
+        pointer_val.to_u64() as *mut T
+    }
 }
 

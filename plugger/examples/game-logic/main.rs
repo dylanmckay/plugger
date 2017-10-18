@@ -7,6 +7,7 @@ extern crate plugger_core;
 use std::io::Write;
 
 #[pluggable]
+#[derive(Debug)]
 pub struct Player {
     x: f32,
     y: f32,
@@ -14,7 +15,24 @@ pub struct Player {
 }
 
 #[pluggable]
+#[derive(Debug)]
+pub struct Enemy {
+    x: f32,
+    y: f32,
+    z: f32,
+}
+
+#[pluggable]
+impl Enemy {
+}
+
+#[pluggable]
 impl Player {
+    // FIXME: make public once callable from Ruby.
+    fn new() -> Self {
+        Player { x: 61.0, y: 62.0, z: 63.0 }
+    }
+
     pub fn info(&self) -> String {
         println!("Player at ({},{},{})", self.x, self.y, self.z);
         "meooooooow".to_owned()
@@ -28,6 +46,10 @@ impl Player {
         println!("setting foobar to '{}'", foobar);
     }
 
+    pub fn check(&self, other: &Player) {
+        println!("checking {:?} with {:?}", self, other);
+    }
+
     pub fn other(&self) -> u32 {
         12345
     }
@@ -39,9 +61,11 @@ impl Player {
 
 fn main() {
     let mut player = Player { x: 1.0, y: 2.0, z: 3.0 };
+    let mut enemy = Enemy { x: 5.0, y: 3.0, z: 0.0 };
 
     let mut ruby = plugger_ruby::Ruby::new().unwrap();
     ruby.plug("player", &mut player);
+    ruby.plug("enemy", &mut enemy);
 
     loop {
         let mut line = String::new();

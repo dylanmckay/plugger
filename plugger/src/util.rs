@@ -1,6 +1,14 @@
 use syntax::ptr::P;
 use syntax::ast::{self, Name, Ty,TyKind,Path};
 
+const BASIC_TYPES: &'static [&'static str] = &[
+    "bool",
+    "u8", "u16", "u32", "u64",
+    "i8", "i16", "i32", "i64",
+    "f32", "f64",
+    "String",
+];
+
 /// Gets the path to a type.
 pub fn ty_path(ty: &P<Ty>) -> &Path {
     if let TyKind::Path(_, ref path) = ty.node {
@@ -48,5 +56,28 @@ pub fn set_return_type(decl: P<ast::FnDecl>, new_ty: P<ast::Ty>) -> P<ast::FnDec
         inputs: decl.inputs.clone(),
         variadic: decl.variadic,
     })
+}
+
+pub enum TypeKind {
+    Basic { name: ast::Ident },
+    Custom { name: ast::Ident },
+}
+
+pub fn ty_kind(ty: &P<Ty>) -> TypeKind {
+    match ty.node {
+        ast::TyKind::Path(_, ref path) => {
+            let ident = path.segments.last().unwrap().identifier;
+
+            if BASIC_TYPES.iter().map(|pt| ast::Ident::from_str(pt)).any(|pt| pt == ident) {
+                TypeKind::Basic { name: ident }
+            } else {
+                TypeKind::Custom { name: ident }
+            }
+        },
+        ast::TyKind::Rptr(_, ref _ty) => {
+            TypeKind::Custom { name: ast::Ident::from_str("foobarpleaseset") }
+        },
+        ref kind => panic!("unknown type kind: '{:?}'", kind),
+    }
 }
 

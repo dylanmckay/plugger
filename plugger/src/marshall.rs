@@ -91,10 +91,18 @@ fn create_common_marshall(ecx: &mut ExtCtxt,
                 PatKind::Ident(_, ref ident, _) => ident.node,
                 _ => unimplemented!(),
             };
-            let ty_name = util::ty_name_str(&arg.ty);
-            let marshall_fn = Ident::from_str(&format!("to_{}", ty_name).to_lowercase());
 
-            P(quote_expr!(ecx, M::$marshall_fn($arg_name)).unwrap())
+            match util::ty_kind(&arg.ty) {
+                // A primitive type.
+                util::TypeKind::Basic { name } => {
+                    let marshall_fn = Ident::from_str(&format!("to_{}", name).to_lowercase());
+
+                    P(quote_expr!(ecx, M::$marshall_fn($arg_name)).unwrap())
+                },
+                util::TypeKind::Custom { .. } => {
+                    P(quote_expr!(ecx, &M::reference_from_value($arg_name)).unwrap())
+                }
+            }
         }
     }).collect();
 
@@ -111,9 +119,18 @@ fn create_common_marshall(ecx: &mut ExtCtxt,
     let result_expr = match method_sig.decl.output {
         ast::FunctionRetTy::Default(..) => call_expr,
         ast::FunctionRetTy::Ty(ref ty) => {
-            let ty_name = util::ty_name_str(&ty);
-            let marshall_fn = Ident::from_str(&format!("from_{}", ty_name).to_lowercase());
-            quote_expr!(ecx, M::$marshall_fn($call_expr))
+            match util::ty_kind(&ty) {
+                // A primitive type.
+                util::TypeKind::Basic { name } => {
+                    let marshall_fn = Ident::from_str(&format!("from_{}", name).to_lowercase());
+                    quote_expr!(ecx, M::$marshall_fn($call_expr))
+                },
+                util::TypeKind::Custom { .. } => {
+                    // quote_expr!(ecx, M::reference_to_value($call_expr))
+                    unimplemented!();
+                }
+            }
+
         },
     };
 

@@ -1,3 +1,5 @@
+use std::mem;
+
 pub type TypeName = &'static str;
 
 #[derive(Clone)]
@@ -58,6 +60,7 @@ pub trait PluggableMethods
 /// An object that can marshall Rust values to an arbitrary value.
 pub trait Marshall
 {
+    /// The value type used by the language.
     type Value;
 
     fn to_bool(value: Self::Value) -> bool;
@@ -85,6 +88,15 @@ pub trait Marshall
     fn from_f32(value: f32) -> Self::Value;
     fn from_f64(value: f64) -> Self::Value;
     fn from_string(value: String) -> Self::Value;
+
+    fn reference_from_value<'a, T>(value: Self::Value) -> &'a T
+        where T: Pluggable {
+        let ptr: *mut T = Self::object_pointer_from_value(value);
+        unsafe { mem::transmute(ptr) }
+    }
+
+    fn object_pointer_from_value<T>(value: Self::Value) -> *mut T
+        where T: Pluggable;
 }
 
 /// An object that can be plugged into a scripting language.
