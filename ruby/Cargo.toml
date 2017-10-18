@@ -11,7 +11,7 @@ keywords = ["ruby", "plugin"]
 license = "MIT"
 
 [dependencies]
-rurust = "0.1.6"
+rurust = "0.1.7"
 plugger-core = { version = "0.3.0", path = "../core" }
 libc = "0.2.11"
 
