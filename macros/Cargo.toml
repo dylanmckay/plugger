@@ -12,8 +12,8 @@ keywords = ["plugin"]
 license = "MIT"
 
 [dependencies]
-plugger-core = "0.2.0"
-plugger-ruby = { version = "0.2.0", optional = true }
+plugger-core = { path = "../core" }
+plugger-ruby = { path = "../ruby", optional = true }
 
 [features]
 default = ["ruby"]
