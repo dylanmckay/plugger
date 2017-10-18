@@ -25,6 +25,11 @@ impl Player {
     }
 
     #[plug]
+    pub fn set_health(&self, health: u8) {
+        println!("setting health to '{}'", health);
+    }
+
+    #[plug]
     pub fn other(&self) -> u32 {
         12345
     }

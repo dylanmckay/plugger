@@ -14,13 +14,15 @@ pub extern fn ruby_method(argc: libc::c_int, argv: *const Value, object: Value) 
     let (method, arguments) = helpers::process_method_arguments(argc, argv);
 
     let receiver = helpers::reference_to_struct(object);
+    // FIXME: pass arguments
     method(receiver)
 }
 
 /// Shim to call a Rust function (doesn't take `self`) from Ruby.
-pub extern fn ruby_singleton_method(argc: libc::c_int, argv: *const Value, class: Value) -> Value {
+pub extern fn ruby_singleton_method(argc: libc::c_int, argv: *const Value, _class: Value) -> Value {
     let (function, arguments) = helpers::process_function_arguments(argc, argv);
 
+    // FIXME: pass arguments
     function()
 }
 

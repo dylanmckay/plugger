@@ -11,15 +11,15 @@ keywords = ["ruby", "plugin"]
 license = "MIT"
 
 [dependencies]
-rurust = "0.1.5"
-plugger-core = "0.1.5"
-plugger-macros = "0.1.5"
+rurust = "0.1.6"
+plugger-core = { path = "../plugger-core" }
+# plugger-core = "0.1.5"
 libc = "0.2.11"
+
+[dev-dependencies]
+plugger-macros = { path = "../plugger-macros" }
 
 [lib]
 name = "plugger_ruby"
 path = "src/lib.rs"
 
-[[bin]]
-name = "test"
-path = "tools/test.rs"
