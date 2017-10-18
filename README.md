@@ -35,45 +35,7 @@ The thing that separates the library from the others is that it allows you to
 - [ ] Automatic marshalling of Rust return types into Ruby values
 - [ ] Support for Python
 
-## Example
+## Examples
 
-**NOTE**: Not everything here is supported yet. This is mostly automatic coercion
-between Rust and Ruby types.
-
-Check `tools/` for a working example.
-
-``` rust
-struct Vector3(pub f64, pub f64, pub f64);
-
-#[pluggable]
-struct Player
-{
-    name: String,
-
-    health: f32,
-
-    position: Vector3,
-    rotation: Vector3,
-}
-
-#[pluggable]
-impl Player
-{
-    pub fn revive(&mut self) { self.health = 1.0 }
-    pub fn rename(&mut self, name: &str) { self.name = name.to_owned() }
-
-    pub fn transport(&mut self, position: Vector3) { self.position = position; }
-}
-
-fn main() {
-    let mut vm = Ruby::new();
-
-    let player = Player { /* ... */ };
-    vm.plug("main_player", player);
-
-    vm.eval("main_player.revive").unwrap();
-    vm.eval("main_player.rename('foo')").unwrap();
-}
-```
-
+Check out [`plugger/examples`](plugger/examples).
 
