@@ -30,6 +30,11 @@ impl Player {
     }
 
     #[plug]
+    pub fn set_foobar(foobar: String) {
+        println!("setting foobar to '{}'", foobar);
+    }
+
+    #[plug]
     pub fn other(&self) -> u32 {
         12345
     }
