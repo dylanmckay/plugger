@@ -17,9 +17,9 @@ pub struct Player {
 #[pluggable]
 impl Player {
     #[plug]
-    pub fn info(&self) -> Value {
+    pub fn info(&self) -> String {
         println!("Player at ({},{},{})", self.x, self.y, self.z);
-        Value::string("meooooooow")
+        "meooooooow".to_owned()
     }
 
     #[plug]

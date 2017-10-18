@@ -21,9 +21,12 @@ pub fn ty_name_str(ty: &P<Ty>) -> Name {
 }
 
 /// Replaces all parameter types in a function declaration.
-pub fn replace_parameter_types(decl: P<ast::FnDecl>, new_ty: P<ast::Ty>) -> P<ast::FnDecl> {
+pub fn replace_signature_types(decl: P<ast::FnDecl>, new_ty: P<ast::Ty>) -> P<ast::FnDecl> {
     P(ast::FnDecl {
-        output: decl.output.clone(),
+        output: match decl.output {
+            ast::FunctionRetTy::Default(sp) => ast::FunctionRetTy::Default(sp),
+            ast::FunctionRetTy::Ty(..) => ast::FunctionRetTy::Ty(new_ty.clone()),
+        },
         variadic: decl.variadic,
         inputs: decl.inputs.iter().map(|arg| {
             if arg.is_self() {

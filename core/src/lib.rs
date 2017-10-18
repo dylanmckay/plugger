@@ -61,7 +61,6 @@ pub trait Marshall
     type Value;
 
     fn to_bool(value: Self::Value) -> bool;
-
     fn to_u8(value: Self::Value) -> u8;
     fn to_u16(value: Self::Value) -> u16;
     fn to_u32(value: Self::Value) -> u32;
@@ -70,11 +69,20 @@ pub trait Marshall
     fn to_i16(value: Self::Value) -> i16;
     fn to_i32(value: Self::Value) -> i32;
     fn to_i64(value: Self::Value) -> i64;
-
     fn to_f32(value: Self::Value) -> f32;
     fn to_f64(value: Self::Value) -> f64;
-
     fn to_string(value: Self::Value) -> String;
+
+    fn from_bool(value: bool) -> Self::Value;
+    fn from_u8(value: u8) -> Self::Value;
+    fn from_u16(value: u16) -> Self::Value;
+    fn from_u32(value: u32) -> Self::Value;
+    fn from_u64(value: u64) -> Self::Value;
+    fn from_i8(value: i8) -> Self::Value;
+    fn from_i16(value: i16) -> Self::Value;
+    fn from_i32(value: i32) -> Self::Value;
+    fn from_i64(value: i64) -> Self::Value;
+    fn from_string(value: String) -> Self::Value;
 }
 
 /// An object that can be plugged into a scripting language.

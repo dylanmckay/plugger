@@ -48,8 +48,8 @@ pub fn create_marshalls(ecx: &mut ExtCtxt,
 /// This can be used to marshall types from any language that has an implementation
 /// of the `Marshall` trait.
 fn create_common_marshall(ecx: &mut ExtCtxt,
-                               original_name: Ident,
-                               method_sig: &ast::MethodSig) -> ImplItem {
+                          original_name: Ident,
+                          method_sig: &ast::MethodSig) -> ImplItem {
     let mut marshall_sig = method_sig.clone();
 
     // Get a path to the `Marshall` trait.
@@ -79,8 +79,8 @@ fn create_common_marshall(ecx: &mut ExtCtxt,
     ]);
     let value_ty = ecx.ty_path(value_ty_path);
 
-    marshall_sig.decl = util::replace_parameter_types(marshall_sig.decl.clone(),
-                                                value_ty);
+    marshall_sig.decl = util::replace_signature_types(marshall_sig.decl.clone(),
+                                                      value_ty);
 
     // Create expressions to marshall given arguments to the correct arguments.
     let marshalled_args: Vec<_> = method_sig.decl.inputs.iter().map(|arg| {
@@ -100,23 +100,35 @@ fn create_common_marshall(ecx: &mut ExtCtxt,
 
     let original_fn_expr = quote_expr!(ecx, Self::$original_name);
 
-    // Add statement to call original function.
-    let call_stmt = Stmt {
+    let call_expr = P(Expr {
         id: DUMMY_NODE_ID,
         span: DUMMY_SP,
-        node: StmtKind::Expr(P(Expr {
-            id: DUMMY_NODE_ID,
-            span: DUMMY_SP,
-            attrs: ThinVec::new(),
-            node: ExprKind::Call(original_fn_expr, marshalled_args),
-        })),
+        attrs: ThinVec::new(),
+        node: ExprKind::Call(original_fn_expr, marshalled_args),
+    });
+
+    // Marshall the return value if present.
+    let result_expr = match method_sig.decl.output {
+        ast::FunctionRetTy::Default(..) => call_expr,
+        ast::FunctionRetTy::Ty(ref ty) => {
+            let ty_name = util::ty_name_str(&ty);
+            let marshall_fn = Ident::from_str(&format!("from_{}", ty_name).to_lowercase());
+            quote_expr!(ecx, M::$marshall_fn($call_expr))
+        },
+    };
+
+    // Add statement to call original function.
+    let result_stmt = Stmt {
+        id: DUMMY_NODE_ID,
+        span: DUMMY_SP,
+        node: StmtKind::Expr(result_expr),
     };
 
     let block = Block {
         id: DUMMY_NODE_ID,
         span: DUMMY_SP,
         rules: BlockCheckMode::Default,
-        stmts: vec![call_stmt],
+        stmts: vec![result_stmt],
     };
 
     ImplItem {
@@ -139,7 +151,7 @@ fn create_lang_marshall(ecx: &mut ExtCtxt,
     let mut marshall_sig = method_sig.clone();
 
     // Replace old parameter types with the language-specific value type.
-    marshall_sig.decl = util::replace_parameter_types(marshall_sig.decl.clone(), lang.value_ty(ecx));
+    marshall_sig.decl = util::replace_signature_types(marshall_sig.decl.clone(), lang.value_ty(ecx));
 
     let common_marshall_expr = config::common_marshall_expr(ecx, original_name, lang);
     // Create argument list.

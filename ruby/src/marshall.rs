@@ -62,5 +62,18 @@ impl plugger_core::Marshall for Marshall {
             panic!("Ruby value is not a String");
         }
     }
+
+    fn from_bool(value: bool) -> Value { Value::boolean(value) }
+    fn from_u8(value: u8) -> Value { Value::integer(value as i64) }
+    fn from_u16(value: u16) -> Value { Value::integer(value as i64) }
+    fn from_u32(value: u32) -> Value { Value::integer(value as i64) }
+    fn from_u64(value: u64) -> Value { Value::integer(value as i64) } // FIXME: this may overflow
+    fn from_i8(value: i8) -> Value { Value::integer(value as i64) }
+    fn from_i16(value: i16) -> Value { Value::integer(value as i64) }
+    fn from_i32(value: i32) -> Value { Value::integer(value as i64) }
+    fn from_i64(value: i64) -> Value { Value::integer(value) }
+    fn from_string(value: String) -> Value {
+        Value::string(&value)
+    }
 }
 
