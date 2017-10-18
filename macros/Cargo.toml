@@ -1,0 +1,27 @@
+[package]
+name = "plugger-macros"
+version = "0.2.0"
+authors = ["Dylan McKay <me@dylanmckay.io>"]
+
+description = "Plugger macros"
+
+# These URLs point to more information about the repository.
+# FIXME: repository = "https://github.com/dylanmckay/plugger-core"
+keywords = ["plugin"]
+
+license = "MIT"
+
+[dependencies]
+plugger-core = "0.2.0"
+plugger-ruby = { version = "0.2.0", optional = true }
+
+[features]
+default = ["ruby"]
+
+# Enable this feature to support ruby.
+ruby = ["plugger-ruby"]
+
+[lib]
+name = "plugger_macros"
+path = "src/lib.rs"
+plugin = true

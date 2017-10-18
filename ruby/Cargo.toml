@@ -1,0 +1,21 @@
+[package]
+name = "plugger-ruby"
+version = "0.2.0"
+authors = ["Dylan McKay <dylan.mckay@powershop.co.nz>"]
+
+description = "Ruby bindings to Plugger"
+repository = "https://github.com/dylanmckay/plugger-ruby"
+
+readme = "README.md"
+keywords = ["ruby", "plugin"]
+license = "MIT"
+
+[dependencies]
+rurust = "0.1.6"
+plugger-core = "0.2.0"
+libc = "0.2.11"
+
+[lib]
+name = "plugger_ruby"
+path = "src/lib.rs"
+

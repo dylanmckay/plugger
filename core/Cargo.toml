@@ -1,0 +1,16 @@
+[package]
+name = "plugger-core"
+version = "0.2.0"
+authors = ["Dylan McKay <me@dylanmckay.io>"]
+
+description = "the Plugger core"
+
+repository = "https://github.com/dylanmckay/plugger-core"
+readme = "README.md"
+keywords = ["plugin"]
+license = "MIT"
+
+[lib]
+name = "plugger_core"
+path = "src/lib.rs"
+
