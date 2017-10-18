@@ -55,13 +55,15 @@ impl Ruby
         let class_builder = object.methods().iter().fold(self.vm.class(object.name()).extend(base_class), |class, method| {
             let ptr = method.marshall("ruby") as usize;
             let ptr_value = self.vm.eval(&format!("{}", ptr)).unwrap();
+            let realised_param_count = method.parameters.len();
+            let actual_param_count = realised_param_count + 1; // Account for the hidden func ptr parameter.
 
             let name = format!("{}_internal", method.name);
 
             if method.is_static {
-                class.singleton_method(name, shims::ruby_singleton_method as *mut _, -1)
+                class.singleton_method(name, shims::ruby_function(realised_param_count) as *mut _, actual_param_count as i8)
             } else {
-                class.method(name, shims::ruby_method as *mut _, -1)
+                class.method(name, shims::ruby_method(realised_param_count) as *mut _, actual_param_count as i8)
             }.constant(method.name.to_uppercase(), ptr_value)
         });
 

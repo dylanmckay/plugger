@@ -2,6 +2,20 @@ module PluggerInternal
   def self.normalize_method_names(names)
     names.map { |method| ((/(.*)_internal/ =~ method.to_s) ? $1 : method).to_sym }
   end
+
+  # Raise an ArgumentError if the given arguments don't match the callee.
+  #
+  # We check this in Rubyland because if we call the internal method
+  # and the arguments are wrong, the ArgumentError message will have
+  # the hidden function pointer included.
+  def self.validate_arguments!(method, original_args)
+    # we don't want to include the hidden method pointer we pass
+    non_self_arg_count = method.arity - 1
+
+    if non_self_arg_count != original_args.size
+      raise ArgumentError, "wrong number of arguments (given #{original_args.size}, expected #{non_self_arg_count})"
+    end
+  end
 end
 
 class PluggerObject
@@ -29,6 +43,8 @@ class PluggerObject
       # to the Rust function.
       internal_method = "#{name}_internal".to_sym
 
+      PluggerInternal.validate_arguments!(method(internal_method), original_args)
+
       arguments = [method_pointer] + original_args
 
       send(internal_method, *arguments)
@@ -47,6 +63,7 @@ class PluggerObject
       # to the Rust function.
       internal_method = "#{name}_internal".to_sym
 
+      PluggerInternal.validate_arguments!(method(internal_method), original_args)
       arguments = [method_pointer] + original_args
 
       send(internal_method, *arguments)

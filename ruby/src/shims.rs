@@ -1,9 +1,15 @@
+//! Shim methods for calling Rust methods from Ruby.
+//!
+//! These methods are hooked into the Ruby VM, which then
+//! dispatch to actual Rust functions.
+
 use rurust::Value;
-use libc;
 use std::mem;
 
 /// A placeholder for any Rust struct.
 pub struct Receiver;
+
+pub type FunctionPointer = fn() -> Value;
 
 /// A method which takes a receiver.
 pub type Method = fn(&mut Receiver) -> Value;
@@ -39,81 +45,164 @@ macro_rules! dispatch {
     }
 }
 
-/// Shim to call a Rust method (taking `&self`) from Ruby.
-pub extern fn ruby_method(argc: libc::c_int, argv: *const Value, object: Value) -> Value {
-    let (method, arguments) = helpers::process_method_arguments(argc, argv);
-
-    let receiver = helpers::reference_to_struct(object);
-
-    let a = arguments;
-    match arguments.len() {
-        0 => dispatch!(method => Method  => (receiver)),
-        1 => dispatch!(method => Method1 => (receiver, a[0])),
-        2 => dispatch!(method => Method2 => (receiver, a[0], a[1])),
-        3 => dispatch!(method => Method3 => (receiver, a[0], a[1], a[2])),
-        4 => dispatch!(method => Method4 => (receiver, a[0], a[1], a[2], a[3])),
-        5 => dispatch!(method => Method5 => (receiver, a[0], a[1], a[2], a[3], a[4])),
-        6 => dispatch!(method => Method6 => (receiver, a[0], a[1], a[2], a[3], a[4], a[5])),
-        7 => dispatch!(method => Method7 => (receiver, a[0], a[1], a[2], a[3], a[4], a[5], a[6])),
-        8 => dispatch!(method => Method8 => (receiver, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7])),
-        9 => dispatch!(method => Method9 => (receiver, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8])),
-        _ => panic!("too many arguments: {}", arguments.len()),
+macro_rules! dispatch_method {
+    ( $func_ptr:expr , $receiver:expr => $method_type:ty => ( $( $arg:expr ),* ) ) => {
+        {
+            let method = helpers::function_pointer($func_ptr);
+            let receiver = helpers::reference_to_struct($receiver);
+            dispatch!( method => $method_type => ( receiver $(, $arg )* ) )
+        }
     }
 }
 
-/// Shim to call a Rust function (doesn't take `self`) from Ruby.
-pub extern fn ruby_singleton_method(argc: libc::c_int, argv: *const Value, _class: Value) -> Value {
-    let (function, arguments) = helpers::process_function_arguments(argc, argv);
-
-    let a = arguments;
-    match arguments.len() {
-        0 => dispatch!(function => Function  => ()),
-        1 => dispatch!(function => Function1 => (a[0])),
-        2 => dispatch!(function => Function2 => (a[0], a[1])),
-        3 => dispatch!(function => Function3 => (a[0], a[1], a[2])),
-        4 => dispatch!(function => Function4 => (a[0], a[1], a[2], a[3])),
-        5 => dispatch!(function => Function5 => (a[0], a[1], a[2], a[3], a[4])),
-        6 => dispatch!(function => Function6 => (a[0], a[1], a[2], a[3], a[4], a[5])),
-        7 => dispatch!(function => Function7 => (a[0], a[1], a[2], a[3], a[4], a[5], a[6])),
-        8 => dispatch!(function => Function8 => (a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7])),
-        9 => dispatch!(function => Function9 => (a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8])),
-        _ => panic!("too many arguments: {}", arguments.len()),
+macro_rules! dispatch_function {
+    ( $func_ptr:expr => $method_type:ty => ( $( $arg:expr ),* ) ) => {
+        {
+            let method = helpers::function_pointer($func_ptr);
+            dispatch!( method => $method_type => ( $( $arg ),* ) )
+        }
     }
+}
+
+/// Gets the shim function that receives a receiver object and `arg_count` arguments.
+pub fn ruby_method(arg_count: usize) -> *mut extern fn() -> Value {
+    match arg_count {
+        0 => self::ruby_method0 as *mut _,
+        1 => self::ruby_method1 as *mut _,
+        2 => self::ruby_method2 as *mut _,
+        3 => self::ruby_method3 as *mut _,
+        4 => self::ruby_method4 as *mut _,
+        5 => self::ruby_method5 as *mut _,
+        6 => self::ruby_method6 as *mut _,
+        7 => self::ruby_method7 as *mut _,
+        8 => self::ruby_method8 as *mut _,
+        9 => self::ruby_method9 as *mut _,
+        _ => panic!("too many arguments: {}", arg_count),
+    }
+}
+
+/// Gets the ruby function that receives `arg_count` arguments.
+pub fn ruby_function(arg_count: usize) -> *mut extern fn() -> Value {
+    match arg_count {
+        0 => self::ruby_function0 as *mut _,
+        1 => self::ruby_function1 as *mut _,
+        2 => self::ruby_function2 as *mut _,
+        3 => self::ruby_function3 as *mut _,
+        4 => self::ruby_function4 as *mut _,
+        5 => self::ruby_function5 as *mut _,
+        6 => self::ruby_function6 as *mut _,
+        7 => self::ruby_function7 as *mut _,
+        8 => self::ruby_function8 as *mut _,
+        9 => self::ruby_function9 as *mut _,
+        _ => panic!("too many arguments: {}", arg_count),
+    }
+}
+
+pub extern fn ruby_method0(receiver: Value, func_ptr: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method => ())
+}
+
+pub extern fn ruby_method1(receiver: Value, func_ptr: Value, a1: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method1 => (a1))
+}
+
+pub extern fn ruby_method2(receiver: Value, func_ptr: Value, a1: Value, a2: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method2 => (a1, a2))
+}
+
+pub extern fn ruby_method3(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method3 => (a1, a2, a3))
+}
+
+pub extern fn ruby_method4(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method4 => (a1, a2, a3, a4))
+}
+
+pub extern fn ruby_method5(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value,
+                           a5: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method5 => (a1, a2, a3, a4, a5))
+}
+
+pub extern fn ruby_method6(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value,
+                           a5: Value, a6: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method6 => (a1, a2, a3, a4, a5, a6))
+}
+
+pub extern fn ruby_method7(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value,
+                           a5: Value, a6: Value, a7: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method7 => (a1, a2, a3, a4, a5, a6, a7))
+}
+
+pub extern fn ruby_method8(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value,
+                           a5: Value, a6: Value, a7: Value, a8: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method8 => (a1, a2, a3, a4, a5, a6, a7, a8))
+}
+
+pub extern fn ruby_method9(receiver: Value, func_ptr: Value,
+                           a1: Value, a2: Value, a3: Value, a4: Value,
+                           a5: Value, a6: Value, a7: Value, a8: Value, a9: Value) -> Value {
+    dispatch_method!(func_ptr, receiver => Method9 => (a1, a2, a3, a4, a5, a6, a7, a8, a9))
+}
+
+pub extern fn ruby_function0(_receiver: Value, func_ptr: Value) -> Value {
+    dispatch_function!(func_ptr => Function => ())
+}
+
+pub extern fn ruby_function1(_receiver: Value, func_ptr: Value, a1: Value) -> Value {
+    dispatch_function!(func_ptr => Function1 => (a1))
+}
+
+pub extern fn ruby_function2(_receiver: Value, func_ptr: Value, a1: Value, a2: Value) -> Value {
+    dispatch_function!(func_ptr => Function2 => (a1, a2))
+}
+
+pub extern fn ruby_function3(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value) -> Value {
+    dispatch_function!(func_ptr => Function3 => (a1, a2, a3))
+}
+
+pub extern fn ruby_function4(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value) -> Value {
+    dispatch_function!(func_ptr => Function4 => (a1, a2, a3, a4))
+}
+
+pub extern fn ruby_function5(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value, a5: Value) -> Value {
+    dispatch_function!(func_ptr => Function5 => (a1, a2, a3, a4, a5))
+}
+
+pub extern fn ruby_function6(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value, a5: Value, a6: Value) -> Value {
+    dispatch_function!(func_ptr => Function6 => (a1, a2, a3, a4, a5, a6))
+}
+
+pub extern fn ruby_function7(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value, a5: Value, a6: Value, a7: Value) -> Value {
+    dispatch_function!(func_ptr => Function7 => (a1, a2, a3, a4, a5, a6, a7))
+}
+
+pub extern fn ruby_function8(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value, a5: Value, a6: Value, a7: Value,
+                             a8: Value) -> Value {
+    dispatch_function!(func_ptr => Function8 => (a1, a2, a3, a4, a5, a6, a7, a8))
+}
+
+pub extern fn ruby_function9(_receiver: Value, func_ptr: Value, a1: Value, a2: Value, a3: Value,
+                             a4: Value, a5: Value, a6: Value, a7: Value,
+                             a8: Value, a9: Value) -> Value {
+    dispatch_function!(func_ptr => Function9 => (a1, a2, a3, a4, a5, a6, a7, a8, a9))
 }
 
 mod helpers {
-    use super::{Receiver, Method, Function};
+    use super::Receiver;
     use rurust::Value;
-    use std::{mem, slice};
-    use libc;
-
-    /// Stores the arguments there were passed to the shim.
-    struct Arguments<'a> {
-        function_ptr: Value,
-        full_arguments: &'a [Value],
-    }
-
-    /// Processes the arguments given to a method shim.
-    pub fn process_method_arguments<'a>(argc: libc::c_int, argv: *const Value) -> (Method, &'a [Value]) {
-        let arguments = self::separate_arguments(argc, argv);
-        (self::method(arguments.function_ptr), arguments.full_arguments)
-    }
-
-    /// Processes the arguments given to a function shim.
-    pub fn process_function_arguments<'a>(argc: libc::c_int, argv: *const Value) -> (Function, &'a [Value]) {
-        let arguments = self::separate_arguments(argc, argv);
-        (self::function(arguments.function_ptr), arguments.full_arguments)
-    }
-
-    /// Given an `argc` and `argv` pair, create a new `Arguments` object.
-    fn separate_arguments<'a>(argc: libc::c_int, argv: *const Value) -> Arguments<'a> {
-        let all_arguments = unsafe { slice::from_raw_parts(argv, argc as usize) };
-
-        Arguments {
-            function_ptr: all_arguments[0],
-            full_arguments: &all_arguments[1..],
-        }
-    }
+    use std::mem;
+    use super::FunctionPointer;
 
     /// Gets a reference to the Rust struct from the associated Ruby object.
     pub fn reference_to_struct<'a>(ruby_object: Value) -> &'a mut Receiver {
@@ -122,13 +211,8 @@ mod helpers {
         receiver
     }
 
-    /// Creates a method from a function pointer given from Ruby.
-    fn method(function_pointer: Value) -> Method {
-        unsafe { mem::transmute(self::function(function_pointer)) }
-    }
-
     /// Creates a function from a function pointer given from Ruby.
-    fn function(function_pointer: Value) -> Function {
+    pub fn function_pointer(function_pointer: Value) -> FunctionPointer {
         let ptr = function_pointer.to_u64() as usize;
 
         unsafe { mem::transmute(ptr) }
