@@ -1,6 +1,5 @@
 #![feature(plugin)]
-
-#![plugin(plugger_macros)]
+#![plugin(plugger)]
 #![allow(dead_code, unused_variables)]
 
 extern crate plugger_core;

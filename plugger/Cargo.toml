@@ -1,9 +1,9 @@
 [package]
-name = "plugger-macros"
+name = "plugger"
 version = "0.2.0"
 authors = ["Dylan McKay <me@dylanmckay.io>"]
 
-description = "Plugger macros"
+description = "Plugger"
 
 repository = "https://github.com/dylanmckay/plugger"
 keywords = ["plugin"]
@@ -21,6 +21,6 @@ default = ["ruby"]
 ruby = ["plugger-ruby"]
 
 [lib]
-name = "plugger_macros"
+name = "plugger"
 path = "src/lib.rs"
 plugin = true

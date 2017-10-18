@@ -7,7 +7,7 @@ pub use rurust::Value as Value;
 /// Shim functions which act as middlemen between C and Ruby.
 pub mod shims;
 
-// Must be public so that the plugger-macros crate can use.
+// Must be public so that the plugger crate can use.
 #[doc(hidden)]
 pub use self::marshall::Marshall;
 

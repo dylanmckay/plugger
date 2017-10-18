@@ -1,7 +1,7 @@
 [workspace]
 members = [
+  "plugger",
   "core",
-  "macros",
   "ruby",
 ]
 

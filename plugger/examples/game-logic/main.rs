@@ -1,6 +1,5 @@
 #![feature(plugin)]
-
-#![plugin(plugger_macros)]
+#![plugin(plugger)]
 
 extern crate plugger_ruby;
 extern crate plugger_core;
