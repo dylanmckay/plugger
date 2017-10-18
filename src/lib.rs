@@ -2,8 +2,16 @@ extern crate plugger_core;
 extern crate rurust;
 extern crate libc;
 
+pub use rurust::Value as Value;
+
 /// Shim functions which act as middlemen between C and Ruby.
 pub mod shims;
+
+// Must be public so that the plugger-macros crate can use.
+#[doc(hidden)]
+pub use self::marshall::Marshall;
+
+mod marshall;
 
 /// The Ruby support code.
 const RUBY_SUPPORT: &'static str = include_str!("../support/ruby.rb");
@@ -45,7 +53,7 @@ impl Ruby
         let base_class = self.vm.eval(PLUGGER_BASE_CLASS).expect("could not find the plugger base class");
 
         let class_builder = object.methods().iter().fold(self.vm.class(object.name()).extend(base_class), |class, method| {
-            let ptr = method.method_pointer as usize;
+            let ptr = method.marshall("ruby") as usize;
             let ptr_value = self.vm.eval(&format!("{}", ptr)).unwrap();
 
             let name = format!("{}_internal", method.name);
