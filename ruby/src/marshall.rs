@@ -73,7 +73,7 @@ impl plugger_core::Marshall for Marshall {
     fn from_i32(value: i32) -> Value { Value::integer(value as i64) }
     fn from_i64(value: i64) -> Value { Value::integer(value) }
     fn from_string(value: String) -> Value {
-        Value::string(&value)
+        Value::string(value)
     }
 }
 

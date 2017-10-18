@@ -5,7 +5,6 @@ extern crate plugger_ruby;
 extern crate plugger_core;
 
 use std::io::Write;
-use plugger_ruby::Value;
 
 #[pluggable]
 pub struct Player {
