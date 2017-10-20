@@ -29,6 +29,7 @@ impl Enemy {
 #[pluggable]
 impl Player {
     // FIXME: make public once callable from Ruby.
+    #[allow(dead_code)]
     fn new() -> Self {
         Player { x: 61.0, y: 62.0, z: 63.0 }
     }
@@ -54,6 +55,7 @@ impl Player {
         12345
     }
 
+    #[allow(dead_code)]
     fn private_method(&self) -> f32 {
         self.x + self.y
     }
@@ -74,11 +76,16 @@ fn main() {
         std::io::stdout().flush().unwrap();
 
         std::io::stdin().read_line(&mut line).unwrap();
+        let line = line.trim();
 
-        match ruby.eval(&line) {
-            Ok(val) => println!("=> {}", val),
-            Err(e) => println!("{:?}", e),
+        match line {
+            "quit" | "exit" => break,
+            _ => match ruby.eval(&line) {
+                Ok(val) => println!("=> {}", val),
+                Err(e) => println!("{:?}", e),
+            },
         }
+
     }
 }
 
