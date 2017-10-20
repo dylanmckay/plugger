@@ -11,15 +11,16 @@ readme = "../README.md"
 keywords = ["plugin"]
 license = "MIT"
 
-[dependencies]
+# Required for the examples.
+[dev-dependencies]
 plugger-core = { path = "../core", version = "0.3" }
-plugger-ruby = { path = "../ruby", version = "0.3", optional = true }
+plugger-ruby = { path = "../ruby", version = "0.3" }
 
 [features]
 default = ["ruby"]
 
 # Enable this feature to support ruby.
-ruby = ["plugger-ruby"]
+ruby = []
 
 [lib]
 name = "plugger"
