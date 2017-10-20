@@ -1,0 +1,18 @@
+[package]
+name = "plugger-test"
+version = "0.3.0"
+authors = ["Dylan McKay <me@dylanmckay.io>"]
+publish = false
+
+description = "The Plugger test suite"
+
+repository = "https://github.com/dylanmckay/plugger"
+readme = "../README.md"
+keywords = ["plugin"]
+license = "MIT"
+
+[dependencies]
+plugger = { path = "../plugger", version = "0.3" }
+plugger-core = { path = "../core", version = "0.3" }
+plugger-ruby = { path = "../ruby", version = "0.3" }
+

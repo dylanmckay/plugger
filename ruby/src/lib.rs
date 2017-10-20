@@ -70,9 +70,9 @@ impl Ruby
         println!("Plugging in {} {}", object.name(), constant_name);
     }
 
-    pub fn eval(&mut self, code: &str) -> Result<String, ErrorKind> {
+    pub fn eval(&mut self, code: &str) -> Result<Value, ErrorKind> {
         match vm().eval(code) {
-            Ok(val) => Ok(val.inspect_string()),
+            Ok(val) => Ok(val),
             Err(e) => Err(ErrorKind::Ruby(e)),
         }
     }

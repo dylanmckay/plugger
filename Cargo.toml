@@ -3,5 +3,6 @@ members = [
   "plugger",
   "core",
   "ruby",
+  "test",
 ]
 

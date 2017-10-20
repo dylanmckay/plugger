@@ -81,7 +81,7 @@ fn main() {
         match line {
             "quit" | "exit" => break,
             _ => match ruby.eval(&line) {
-                Ok(val) => println!("=> {}", val),
+                Ok(val) => println!("=> {:?}", val),
                 Err(e) => println!("{:?}", e),
             },
         }
