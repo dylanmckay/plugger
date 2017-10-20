@@ -63,6 +63,20 @@ impl plugger_core::Marshall for Marshall {
         }
     }
 
+    fn reference_to_value<T>(reference: &T) -> Value
+        where T: plugger_core::Pluggable {
+        let pointer = reference as *const T as *mut T;
+
+        let code = format!("{}.new({:#x}, :ownership => PluggerObject::Ownership::BORROWED)",
+            reference.name(), pointer as usize);
+        panic!("code: '{}'", code);
+    }
+
+    fn object_to_owned_value<T>(object: T) -> Value
+        where T: plugger_core::Pluggable {
+        let boxed_object = Box::new(object);
+    }
+
     fn from_bool(value: bool) -> Value { Value::boolean(value) }
     fn from_u8(value: u8) -> Value { Value::integer(value as i64) }
     fn from_u16(value: u16) -> Value { Value::integer(value as i64) }

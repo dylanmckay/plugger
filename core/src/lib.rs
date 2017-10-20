@@ -76,6 +76,15 @@ pub trait Marshall
     fn to_f64(value: Self::Value) -> f64;
     fn to_string(value: Self::Value) -> String;
 
+    /// Marshalls a reference to a value into a value.
+    fn reference_to_value<T>(reference: &T) -> Self::Value
+        where T: Pluggable;
+
+    /// Transfers ownership of a Rust object to the language
+    /// VM, returning a value that must be freed by the VM.
+    fn object_to_owned_value<T>(object: T) -> Self::Value
+        where T: Pluggable;
+
     fn from_bool(value: bool) -> Self::Value;
     fn from_u8(value: u8) -> Self::Value;
     fn from_u16(value: u16) -> Self::Value;

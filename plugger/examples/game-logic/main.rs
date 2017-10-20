@@ -28,9 +28,7 @@ impl Enemy {
 
 #[pluggable]
 impl Player {
-    // FIXME: make public once callable from Ruby.
-    #[allow(dead_code)]
-    fn new() -> Self {
+    pub fn new() -> Self {
         Player { x: 61.0, y: 62.0, z: 63.0 }
     }
 
