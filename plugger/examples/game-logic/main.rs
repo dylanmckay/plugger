@@ -6,6 +6,10 @@ extern crate plugger_core;
 
 use std::io::Write;
 
+fn foo() {
+    plugger::foo();
+}
+
 #[pluggable]
 #[derive(Debug)]
 pub struct Player {
