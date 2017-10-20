@@ -126,8 +126,7 @@ fn create_common_marshall(ecx: &mut ExtCtxt,
                     quote_expr!(ecx, M::$marshall_fn($call_expr))
                 },
                 util::TypeKind::Custom { .. } => {
-                    // quote_expr!(ecx, M::reference_to_value($call_expr))
-                    unimplemented!();
+                    quote_expr!(ecx, M::reference_to_value($call_expr))
                 }
             }
 

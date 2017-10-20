@@ -45,10 +45,19 @@ class PluggerObject
   include Dispatcher # dispatch methods
   extend Dispatcher  # dispatch singleton methods
 
-  attr_reader :object_pointer
+  # Defines the ownership of a Rust object.
+  module Ownership
+    # We (the Ruby code) own the value and we must destroy it when done.
+    OWNED = "owned"
+    # We are borrowing the value from pure Rust.
+    BORROWED = "borrowed"
+  end
 
-  def initialize(object_pointer)
+  attr_reader :object_pointer, :ownership
+
+  def initialize(object_pointer, ownership:)
     @object_pointer = object_pointer
+    @ownership = ownership
   end
 
   protected

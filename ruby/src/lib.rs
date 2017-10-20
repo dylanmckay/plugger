@@ -64,7 +64,7 @@ impl Ruby
 
         let constant_name = name.to_uppercase();
 
-        let ruby_val = vm.eval(&format!("{}.new({})", object.name(), ptr)).unwrap();
+        let ruby_val = vm.eval(&format!("{}.new({}, :ownership => PluggerObject::Ownership::BORROWED)", object.name(), ptr)).unwrap();
         vm.set_global_const(&constant_name, ruby_val);
 
         println!("Plugging in {} {}", object.name(), constant_name);
