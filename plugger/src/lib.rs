@@ -1,3 +1,11 @@
+//! The Plugger syntax extension.
+//!
+//! ```
+//! #[pluggable]
+//! pub struct foo {
+//! }
+//! ```
+
 #![feature(box_syntax)]
 #![feature(plugin_registrar)]
 #![feature(rustc_private)]
